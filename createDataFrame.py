@@ -17,8 +17,11 @@ import pandas as pd
 # convert a string to datetime field
 def convertToDateOld(date):
     # format is YYMMDD
-    date_str = str(date)
-    date_str = '19' + date_str   # make it 19yy instead of just yy
+    date_str = '{:06d}'.format(date)
+    if int(date_str[0]) < 3:
+        date_str = '20' + date_str   # make it 20yy instead of just yy
+    else:
+        date_str = '19' + date_str   # make it 19yy instead of just yy
     format = "%Y%m%d"
     datetime = pd.to_datetime(date_str, format=format)
     return datetime
@@ -125,8 +128,8 @@ def main():
                         help='set verbose level')
     parser.add_argument('-l', '--logfile', type=str, default='-',
                         help='set log file (default stderr "-")')
-    parser.add_argument('-R', '--regex', type=str, default='*.TXT',
-                        help='regex for file name (default="*.TXT")')
+    parser.add_argument('-R', '--regex', type=str, default='*.txt',
+                        help='regex for file name (default="*.txt")')
     parser.add_argument('-o', '--output', type=argparse.FileType('w'),
                         default=sys.stdout,
                         help='output file (default=stdout)')
