@@ -78,6 +78,7 @@ def process_file(file_name, encoding):
         row['close_rel'] = row['close'] / final_close
         # insert this row and "missing days", eg, weekends and holidays
         for k in range(last - day):
+            row = row.copy()
             row['day'] = last - 1 - k
             df2 = df2.append(row)
         last = day
