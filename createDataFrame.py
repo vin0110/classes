@@ -60,7 +60,6 @@ def process_file(file_name, encoding):
     # df_copy = df.copy()
 
     days_max = df["day"].iloc[0]
-    final_open = df['open'].iloc[-1]
     final_close = df['close'].iloc[-1]
 
     # insert "missing days"
@@ -72,9 +71,9 @@ def process_file(file_name, encoding):
         row = df.iloc[i]
         row = row.copy()
         day = df.iloc[i]['day']
-        row['open_net'] = row['open'] - final_open
+        row['open_net'] = row['open'] - final_close
         row['close_net'] = row['close'] - final_close
-        row['open_rel'] = row['open'] / final_open
+        row['open_rel'] = row['open'] / final_close
         row['close_rel'] = row['close'] / final_close
         # insert this row and "missing days", eg, weekends and holidays
         for k in range(last - day):
