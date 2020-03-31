@@ -119,7 +119,7 @@ def run(args):
 
 def main():
     '''
-    blah, blah
+    creates a pandas data frame from the CSV files in a directory.
     '''
     parser = argparse.ArgumentParser(description=main.__doc__)
     parser.add_argument('-d', '--debug', action="count",
