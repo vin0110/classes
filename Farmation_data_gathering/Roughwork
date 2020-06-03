@@ -92,3 +92,14 @@ finalData := loop(namesTable, count(namesTable), fJoin(rows(left)));
 //   self.FieldPos  :=  pRight.FieldPos;  // Sets up for next JOIN
 //   self.TextValue :=  trim(pLeft.TextValue) + if(pRight.FieldPos <> 0, ',' + trim(pRight.TextValue), '');  // both TRIMs probably redundant
 // end;
+
+IMPORT STD;
+STD.File.CreateSuperFile( '~test::TBD::crop_prices_SF',false,true);
+//STD.File.GetSuperFileSubCount( '~test::tbd::sfwheat');
+SEQUENTIAL(
+ STD.File.StartSuperFileTransaction(),
+ STD.File.AddSuperFile('~test::TBD::crop_prices_SF','~test::tbd::sfwheat_formatted'),
+ STD.File.AddSuperFile('~test::TBD::crop_prices_SF','~test::tbd::sfcorn_formatted'),
+ STD.File.AddSuperFile('~test::TBD::crop_prices_SF','~test::tbd::sfsoy_formatted'),
+ STD.File.FinishSuperFileTransaction()
+);

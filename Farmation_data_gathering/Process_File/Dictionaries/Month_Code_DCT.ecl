@@ -1,5 +1,8 @@
 Month_Codes := DATASET([{'H', 3}, 
     {'K', 5}, 
+    {'F', 1}, 
+    {'Q', 8}, 
+    {'X', 11}, 
     {'U', 9}, 
     {'N', 7}, 
     {'Z', 12}], {STRING code, Integer month});
