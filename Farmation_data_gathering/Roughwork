@@ -1,0 +1,94 @@
+IMPORT STD;
+STD.File.CreateSuperFile( '~test::TBD::SF1',false,true);
+STD.File.GetSuperFileSubCount( '~test::TBD::SF1');
+IMPORT STD;
+SEQUENTIAL(
+ STD.File.StartSuperFileTransaction(),
+ STD.File.AddSuperFile('MySuperFile1','MySubFile1'),
+ STD.File.AddSuperFile('MySuperFile1','MySubFile2'),
+ STD.File.AddSuperFile('MySuperFile2','MySuperFile1'),
+ STD.File.RemoveSuperFile('MySuperFile','MySubFile'),
+ STD.File.RemoveOwnedSubFiles('MySuperFile'),
+ STD.File.ReplaceSuperFile( superfile, subfile1 , subfile2 )
+ STD.File.AddSuperFile('MySuperFile3','MySuperFile1',addcontents := true),
+ STD.File.FinishSuperFileTransaction()
+);
+OUTPUT(STD.File.SuperFileContents('~test::TBD::sfcorn'));
+
+
+IMPORT $,$.Dictionaries, STD;
+
+namesRec := RECORD
+ STRING fname;
+END;
+
+$.Records.ContractLayout transformToFinalFormat(//$.Records.RawTypeTurtleRecord,
+                                                namesRec filename,
+                                                $.File_RawData pInput)
+                                                // $.File_RawData pInput, 
+                                                // $.File_RawData lastEntry) 
+                                                // STD.Date.Date_t contractDate, 
+                                                // STD.Date.Date_t lastEntryDate)
+:= Transform
+   // File_RawData := DATASET('~test::TBD::'+filename.fname,$.Records.RawTypeTurtleRecord,CSV);
+   // $.File_RawData pInput := File_RawData[2..];
+   // pInput := dsInput[2..];
+   String tempName := STD.STr.RemoveSuffix(filename.fname, '.txt');
+   Integer contractMonth := Dictionaries.Month_code_DCT(STD.Str.ToUpperCase(tempName[length(tempName)]));
+   temp := STD.STr.RemoveSuffix(tempName, tempName[length(tempName)]);
+   Integer tempYear := (Integer)temp[length(temp)-1..length(temp)];
+   Integer contractYear := IF(tempYear >= 50, tempYear+1900, tempYear+2000);
+   // lastEntry := pInput[COUNT(pInput)];
+   contractDate := STD.Date.FromStringToDate('' + contractMonth + '/' + contractYear, '%m/%Y');
+   // lastEntryDate := STD.Date.FromStringToDate(lastEntry.Date, '%m/%d/%Y');
+
+   SELF.DATE :=  STD.Date.FromStringToDate(pInput.Date, '%m/%d/%Y');
+   // SELF.FinalOpen := lastEntry.Open;
+   // SELF.FinalClose := lastEntry.Close;
+   // SELF.DaysToExpire := STD.Date.DaysBetween( SELF.Date, lastEntryDate);
+   SELF.ContractMonth := STD.Date.Month(contractDate);
+   SELF.ContractYear := STD.Date.Year(contractDate);
+   SELF := pInput;
+   SELF := [];
+   // transformedDataset := PROJECT(pInput,$.transformation(LEFT, lastEntryDate, contractDate, lastEntry));
+   // o := OUTPUT(transformedDataset,,'~test::super::corn' + tempname,OVERWRITE);
+   // SELF := transformedDataset[1];
+   // SELF := JOIN(transformedDataset, transformedDataset, 2 >= 1);;
+   // SELF.FinalOpen := lastEntry.Open;
+   // SELF.FinalClose := lastEntry.Close;
+   // SELF.count := 5;
+   // SELF.DATE :=  STD.Date.FromStringToDate(pInput.Date, '%m/%d/%Y');
+   // SELF.DaysToExpire := STD.Date.DaysBetween( SELF.Date, lastEntryDate);
+   // SELF.ContractMonth := STD.Date.Month(contractDate);
+   // SELF.ContractYear := STD.Date.Year(contractDate);
+   // SELF := pInput;
+   // SELF.Open := pInput.Open;
+   // SELF.High := pInput.High;
+   // SELF.Low := pInput.Low;
+   // SELF.Close := pInput.Close;
+   // SELF.Volume := pInput.Volume;
+   // SELF.OpenInt := pInput.OpenInt;
+   // Return When(transformedDataset,o);
+END ;
+
+String filename := '' : Stored('filename');
+namesTable := DATASET([{filename}], namesRec);
+// namesTable := STD.File.SuperFileContents('~test::TBD::sfcorn');
+// transformedDataset := PROJECT(namesTable,transformToFinalFormat(LEFT));
+// transformedDataset := PROJECT(pInput,transformToFinalFormat(LEFT, lastEntry, contractDate, lastEntryDate));
+// LOOP(namesTable,1, ROWS(LEFT) & transformToFinalFormat(ROWS(LEFT)));
+// OUTPUT(transformedDataset);
+
+
+fJoin(dataset(namesRec) filename) := join(filename, DATASET('~test::TBD::c00k.txt',$.Records.RawTypeTurtleRecord,CSV)[2..],
+                                          TRUE,
+                                          transformToFinalFormat(left, right)
+                                       );
+finalData := loop(namesTable, count(namesTable), fJoin(rows(left)));
+
+// OUTPUT(finalData,,'~test::TBD::' + STD.STr.RemoveSuffix(filename, '.txt'),OVERWRITE);
+// rIn  tJoin(rIn pLeft, rIn pRight) :=
+// transform
+//   self.FieldPos  :=  pRight.FieldPos;  // Sets up for next JOIN
+//   self.TextValue :=  trim(pLeft.TextValue) + if(pRight.FieldPos <> 0, ',' + trim(pRight.TextValue), '');  // both TRIMs probably redundant
+// end;
