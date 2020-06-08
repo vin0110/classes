@@ -1,9 +1,8 @@
-IMPORT $,$.Dictionaries, STD;
+IMPORT $, $.^.Records, $.^.Dictionaries, STD;
 
-
-$.Records.ContractLayout transformToFinalFormat(
-                                                $.Records.RawTypeTurtleRecord pInput,
-                                                $.Records.midlevelDS individualRec)
+EXPORT Records.ContractLayout NormalizedToFinalFormat(
+                                                Records.RawTypeTurtleRecord pInput,
+                                                Records.midlevelDS individualRec)
 := Transform, SKIP(STD.Str.CompareIgnoreCase( pInput.Date, 'date') = 0)
    String tempName := STD.STr.RemoveSuffix(individualRec.filename, '.txt');
    Integer contractMonth := Dictionaries.Month_code_DCT(STD.Str.ToUpperCase(tempName[length(tempName)]));
@@ -25,24 +24,3 @@ $.Records.ContractLayout transformToFinalFormat(
    SELF := pInput;
    SELF.Crop := tempCrop[length(tempCrop)]
 END ;
-
-String superfilename := '' : Stored('superfilename');
-SubFiles := NOTHOR(STD.File.SuperFileContents('~'+superfilename));
-
-$.Records.midlevelDS mdt($.Records.midlevelDS L) := TRANSFORM
- SELF.filename := L.filename;
- Self.lastentry := L.lastentry;
-END;
-
-NestedDS := PROJECT(SubFiles,
-               TRANSFORM($.Records.NestedDS_Record,
-                           ds := DATASET('~'+ LEFT.name,$.Records.RawTypeTurtleRecord,CSV);
-                           SELF.file := ds;//[2..];
-                           $.Records.midlevelDS mds := PROJECT(DATASET([{LEFT.name,ds[COUNT(ds)]}],$.Records.midlevelDS),mdt(LEFT));
-                           SELF.individualRec := mds
-                           ));
-
-finalContent := NORMALIZE(NestedDS,LEFT.file,transformToFinalFormat(RIGHT,LEFT.individualRec[1]));
-
-Output(finalContent,,'~'+superfilename + '_formatted',OVERWRITE);
-

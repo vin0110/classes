@@ -6,12 +6,12 @@ EXPORT ContractLayout := RECORD
  INTEGER4  ContractYear;
  INTEGER4 DaysToExpire;
  STD.Date.Date_t Date;
- DECIMAL10 Open;
- DECIMAL10 High;
- DECIMAL10 Low;
- DECIMAL10 Close;
+ DECIMAL7_3 Open;
+ DECIMAL7_3 High;
+ DECIMAL7_3 Low;
+ DECIMAL7_3 Close;
  INTEGER Volume;
  INTEGER OpenInt;
- DECIMAL10 FinalOpen;
- DECIMAL10 FinalClose;
+ DECIMAL7_3 FinalOpen;
+ DECIMAL7_3 FinalClose;
 END;
