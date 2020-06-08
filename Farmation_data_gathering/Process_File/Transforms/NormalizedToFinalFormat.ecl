@@ -2,7 +2,7 @@ IMPORT $, $.^.Records, $.^.Dictionaries, STD;
 
 EXPORT Records.ContractLayout NormalizedToFinalFormat(
                                                 Records.RawTypeTurtleRecord pInput,
-                                                Records.midlevelDS individualRec)
+                                                Records.filename_lastEntry_Record individualRec)
 := Transform, SKIP(STD.Str.CompareIgnoreCase( pInput.Date, 'date') = 0)
    String tempName := STD.STr.RemoveSuffix(individualRec.filename, '.txt');
    Integer contractMonth := Dictionaries.Month_code_DCT(STD.Str.ToUpperCase(tempName[length(tempName)]));

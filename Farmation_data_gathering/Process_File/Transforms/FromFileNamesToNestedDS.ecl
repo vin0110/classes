@@ -2,6 +2,8 @@ IMPORT $, $.^.Records;
 EXPORT Records.NestedDS_Record FromFileNamesToNestedDS(String filename) := TRANSFORM
     ds := DATASET('~'+ filename,Records.RawTypeTurtleRecord,CSV);
     SELF.file := ds;//[2..];
-    Records.midlevelDS mds := PROJECT(DATASET([{filename,ds[COUNT(ds)]}],Records.midlevelDS),$.mdt(LEFT));
+    Records.filename_lastEntry_Record mds := PROJECT(DATASET([{filename,ds[COUNT(ds)]}],Records.filename_lastEntry_Record),
+                                        TRANSFORM(Records.filename_lastEntry_Record,
+                                        SELF := LEFT));
     SELF.individualRec := mds
 END;
