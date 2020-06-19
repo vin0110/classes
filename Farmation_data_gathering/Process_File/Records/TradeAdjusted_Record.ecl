@@ -1,0 +1,7 @@
+IMPORT STD;
+EXPORT TradeAdjusted_Record := RECORD
+ STD.Date.Date_t  date;
+ DECIMAL10_4 AFEGS;
+ DECIMAL10_4 BGS;
+ DECIMAL10_4 EMEGS;
+END;

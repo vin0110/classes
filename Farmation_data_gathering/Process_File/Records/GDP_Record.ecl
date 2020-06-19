@@ -1,0 +1,5 @@
+EXPORT GDP_Record := RECORD
+ INTEGER4  Year;
+ String2 Quarter;
+ DECIMAL7_3 GDP;
+END;
