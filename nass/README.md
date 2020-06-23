@@ -38,3 +38,10 @@ This work
 looks at `statisticcat_desc` by
 * source_desc (census or survey)
 * group_desc ('CROP TOTALS', 'FIELD CROPS', 'FRUIT & TREE NUTS', 'HORTICULTURE','VEGETABLES')
+
+
+test::usda::state_annual_fieldcrops_corn 
+* contains pretty readable data
+* If we filter there by year (eg. 1955) the data looks comporehensible and presentable.
+* Also the scattered cardinality of statisticcat_desc too makes sense now as it is a combination of statisticcat_desc and unit_desc
+* We can restructure at this level into complex DS's and form queries.
