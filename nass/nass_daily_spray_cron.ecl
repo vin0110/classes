@@ -5,4 +5,8 @@ tue_satMorning :=
 CRON('30 13 * * 2-6');
 //17 - 1pm
 
-$.nass_daily_spray : WHEN(tue_satMorning)
+SEQUENTIAL(
+    $.nass_daily_spray,
+    $.processquickstatsfiles
+        ) : WHEN(tue_satMorning);
+// $.nass_daily_spray : WHEN(tue_satMorning)
