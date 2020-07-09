@@ -1,5 +1,7 @@
 import $;
 export Nested_record := RECORD
+	$.QuickstatsRecord.year;
+	$.QuickstatsRecord.state_alpha;
     $.QuickstatsRecord.commodity_desc;
 	$.QuickstatsRecord.class_desc;
 	$.QuickstatsRecord.util_practice_desc;
