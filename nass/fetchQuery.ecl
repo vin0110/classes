@@ -1,14 +1,14 @@
 IMPORT $.records,std;
 
-filename:= '~test::usda::hierarchy6::state::annual::corn_wheat_barley_hay_combined';
+filename:= '~test::usda::economics::hierarchy6::state::annual::income_Formatted';
 
 ds := DATASET(filename, 
                 {records.combinedrec,UNSIGNED8 fpos {virtual(fileposition)}},
                 FLAT,lookup);
-idx := INDEX(ds,{state_alpha,year,crop,fpos},'~test::usda::hierarchy6::state::annual::corn_wheat_barley_hay_combined_index');
+idx := INDEX(ds,{state_alpha,year,crop,fpos},'~test::usda::economics::hierarchy6::state::annual::income_Formatted_index');
 
 // integer4 yearVar := 2009 :STORED('year');
-STRING117 cropVar := 'BARLEY -ALL CLASSES -ALL UTILIZATION PRACTICES' :STORED('crop');
+STRING117 cropVar := 'INCOME, NET CASH FARM-OF OPERATORS' :STORED('crop');
 STRING2 state := 'NC' :STORED('state');
 resultSet :=
  FETCH(ds,

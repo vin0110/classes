@@ -1,6 +1,6 @@
 IMPORT $.records,std;
 
-filename:= '~test::usda::hierarchy6::state::annual::state_crop';
+filename:= '~test::usda::hierarchy6::state::monthly::crops_list_by_state';
 
 ds := DATASET(filename, 
                 {records.combinedrec,UNSIGNED8 fpos {virtual(fileposition)}},
