@@ -1,12 +1,12 @@
-import 'dart:convert';
-
+import 'package:farmation_front_end/products/EconomicsAnnualAGLandProduct.dart';
+import 'package:farmation_front_end/products/EconomicsAnnualIncomeProduct.dart';
 import 'package:flutter/material.dart';
 
-import 'package:http/http.dart' as http;
-
-import 'Product.dart';
+import 'products/StateAnnualCropProduct.dart';
+import 'products/StateMonthlyCropProduct.dart';
 
 import 'SimpleBarChart.dart';
+import 'Constants.dart' as constc;
 
 void main() {
   runApp(MyApp());
@@ -32,7 +32,6 @@ class MyHomePage extends StatelessWidget {
 
   final String title;
 
-  int _counter = 0;
   final _formKey = GlobalKey<FormState>();
   final stateController = TextEditingController();
   final yearController = TextEditingController();
@@ -65,19 +64,81 @@ class MyHomePage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: RaisedButton(
                   onPressed: () {
+                    if (_formKey.currentState.validate()) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Listwidget(
+                                  crops: fetchVariants(constc.STATE_ANNUAL_CROP,
+                                      stateController.text),
+                                  state: stateController.text,
+                                  dataIndicator: constc.STATE_ANNUAL_CROP)));
+                    }
+                  },
+                  child: Text('Continue to Annual Data'),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: RaisedButton(
+                  onPressed: () {
                     // Validate will return true if the form is valid, or false if
                     // the form is invalid.
                     if (_formKey.currentState.validate()) {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => CropListwidget(
-                                  crops:
-                                      fetchAvailableCrops(stateController.text),
-                                  state: stateController.text)));
+                              builder: (context) => Listwidget(
+                                    crops: fetchVariants(
+                                        constc.STATE_MONTHLY_CROP,
+                                        stateController.text),
+                                    state: stateController.text,
+                                    dataIndicator: constc.STATE_MONTHLY_CROP,
+                                  )));
                     }
                   },
-                  child: Text('Submit'),
+                  child: Text('Continue to Monthly Data'),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: RaisedButton(
+                  onPressed: () {
+                    if (_formKey.currentState.validate()) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Listwidget(
+                                  crops: fetchVariants(
+                                      constc.ECONOMICS_ANNUAL_INCOME,
+                                      stateController.text),
+                                  state: stateController.text,
+                                  dataIndicator:
+                                      constc.ECONOMICS_ANNUAL_INCOME)));
+                    }
+                  },
+                  child: Text('Continue to Annual Economic Income Data'),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: RaisedButton(
+                  onPressed: () {
+                    if (_formKey.currentState.validate()) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Listwidget(
+                                  crops: fetchVariants(
+                                      constc.ECONOMICS_ANNUAL_AG_LAND,
+                                      stateController.text),
+                                  state: stateController.text,
+                                  dataIndicator:
+                                      constc.ECONOMICS_ANNUAL_AG_LAND)));
+                    }
+                  },
+                  child: Text(
+                      'Continue to Annual Economic Agricultural Land data'),
                 ),
               ),
             ],
@@ -88,28 +149,52 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-class CropListwidget extends StatelessWidget {
+Future<List<String>> fetchVariants(int dataIndicator, String state) {
+  switch (dataIndicator) {
+    case constc.STATE_ANNUAL_CROP:
+      return StateAnnualCropProduct.fetchVariants(state);
+      break;
+    case constc.STATE_MONTHLY_CROP:
+      return StateMonthlyCropProduct.fetchVariants(state);
+      break;
+    case constc.ECONOMICS_ANNUAL_AG_LAND:
+      return EconomicsAnnualAGLandProduct.fetchVariants(state);
+      break;
+    case constc.ECONOMICS_ANNUAL_INCOME:
+      return EconomicsAnnualIncomeProduct.fetchVariants(state);
+      break;
+    default:
+      print('ERROR 5984954');
+      return null;
+  }
+}
+
+class Listwidget extends StatelessWidget {
   final Future<List<String>> crops;
 
   final String state;
 
-  CropListwidget({Key key, this.crops, this.state}) : super(key: key);
+  final int dataIndicator;
+
+  Listwidget({Key key, this.crops, this.state, this.dataIndicator})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title:
-                Text("List of crops available for view for state: " + state)),
+            title: Text("List of data variants available for view for state: " +
+                state)),
         body: Center(
           child: FutureBuilder<List<String>>(
             future: crops,
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
               return snapshot.hasData
-                  ? CropBoxList(
+                  ? BoxList(
                       crops: snapshot.data,
                       state: state,
+                      dataIndicator: dataIndicator,
                     )
                   // return the ListView widget :
                   : Center(child: CircularProgressIndicator());
@@ -119,10 +204,11 @@ class CropListwidget extends StatelessWidget {
   }
 }
 
-class CropBoxList extends StatelessWidget {
+class BoxList extends StatelessWidget {
   final List<String> crops;
   final String state;
-  CropBoxList({Key key, this.crops, this.state});
+  final int dataIndicator;
+  BoxList({Key key, this.crops, this.state, this.dataIndicator});
 
   @override
   Widget build(BuildContext context) {
@@ -138,9 +224,10 @@ class CropBoxList extends StatelessWidget {
               MaterialPageRoute(
                 // builder: (context) => ProductPage(item: items[index]),
                 builder: (context) => SimpleBarChart(
-                  crops: getProductList(crops[index], state),
+                  crops: fetchCrops(dataIndicator, crops[index], state),
                   animate: true,
                   crop: crops[index],
+                  dataIndicator: dataIndicator,
                 ),
                 // builder: (context) => PiePage(items),
               ),
@@ -152,41 +239,22 @@ class CropBoxList extends StatelessWidget {
   }
 }
 
-Future<List<String>> fetchAvailableCrops(String state) async {
-  final response = await http.get(
-      'http://localhost:8002/WsEcl/submit/query/thor/getcroplist/json?state=' +
-          state +
-          '&submit_type=json');
-  if (response.statusCode == 200) {
-    return parseCropResponse(response.body);
-  } else {
-    throw Exception('Unable to fetch products from the REST API');
-  }
-}
-
-List<String> parseCropResponse(String responseBody) {
-  print(responseBody);
-  dynamic tmp = json.decode(responseBody);
-  final parsed =
-      tmp['getcroplistResponse']['Results']['Result 1']['Row'].cast<dynamic>();
-  return parsed.map<String>((jsonobj) => jsonobj['crop'].toString()).toList();
-}
-
-List<Product> parseProducts(String responseBody) {
-  print(responseBody);
-  dynamic tmp = json.decode(responseBody);
-  final parsed = tmp['fetchqueryResponse']['Results']['Result 1']['Row']
-      .cast<Map<String, dynamic>>();
-  return parsed.map<Product>((jsonobj) => Product.fromJson(jsonobj)).toList();
-}
-
-Future<List<Product>> getProductList(String crop, String state) async {
-  final response = await http.post(
-      'http://localhost:8002/WsEcl/submit/query/thor/fetchquery/json',
-      body: {'submit_type': 'json', 'crop': crop, 'state': state});
-  if (response.statusCode == 200) {
-    return parseProducts(response.body);
-  } else {
-    throw Exception('Unable to fetch products from the REST API');
+fetchCrops(int dataIndicator, String crop, String state) {
+  switch (dataIndicator) {
+    case constc.STATE_ANNUAL_CROP:
+      return StateAnnualCropProduct.getProducts(crop, state);
+      break;
+    case constc.STATE_MONTHLY_CROP:
+      return StateMonthlyCropProduct.getProducts(crop, state);
+      break;
+    case constc.ECONOMICS_ANNUAL_AG_LAND:
+      return EconomicsAnnualAGLandProduct.getProducts(crop, state);
+      break;
+    case constc.ECONOMICS_ANNUAL_INCOME:
+      return EconomicsAnnualIncomeProduct.getProducts(crop, state);
+      break;
+    default:
+      print('ERROR 64897');
+      return null;
   }
 }
