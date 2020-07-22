@@ -41,14 +41,14 @@ import $.records,std;
 
 // -----------------------------------------------------
 
-ds4 := DATASET('~test::usda::hierarchy6::county::annual::corn_wheat_barley_hay', 
+ds4 := DATASET('~test::usda::hierarchy6::state::annual::corn_wheat_barley_hay', 
                 records.QuickStatsRecord,
                 FLAT,lookup);
 
 
 groupds:= GROUP(SORT(ds4,//(statisticcat_desc = 'AREA HARVESTED' or statisticcat_desc = 'YIELD' or statisticcat_desc = 'PRODUCTION'), 
-                    commodity_desc,class_desc,prodn_practice_desc,util_practice_desc,state_alpha,year,county_code),
-                commodity_desc,class_desc,prodn_practice_desc,util_practice_desc,state_alpha,year,county_code);
+                    commodity_desc,class_desc,util_practice_desc,state_alpha,year),
+                commodity_desc,class_desc,util_practice_desc,state_alpha,year);
 
 tempDs := ROLLUP(groupds, GROUP,
             TRANSFORM(records.nested_record,
@@ -58,9 +58,9 @@ tempDs := ROLLUP(groupds, GROUP,
 
 records.combinedrec reshape(records.nested_record tempds) := 
     TRANSFORM
-    , SKIP(not (exists(tempds.sub_record(statisticcat_desc='AREA HARVESTED'))
-                and exists(tempds.sub_record(statisticcat_desc='YIELD'))
-                and exists(tempds.sub_record(statisticcat_desc='PRODUCTION'))))
+    // , SKIP(not (exists(tempds.sub_record(statisticcat_desc='AREA HARVESTED'))
+    //             and exists(tempds.sub_record(statisticcat_desc='YIELD'))
+    //             and exists(tempds.sub_record(statisticcat_desc='PRODUCTION'))))
         tmp:=tempds.sub_record(statisticcat_desc = 'AREA HARVESTED');
         SELF.AREA_HARVESTED := tmp[1].value;
         SELF.unit_AREA_HARVESTED := tmp[1].unit_desc;
@@ -70,13 +70,16 @@ records.combinedrec reshape(records.nested_record tempds) :=
         tmp3:=tempds.sub_record(statisticcat_desc = 'PRODUCTION');
         SELF.PRODUCTION := tmp3[1].value;
         SELF.unit_PRODUCTION := tmp3[1].unit_desc;
-        tmpCrop:= tempds.commodity_desc + '-' + tempds.class_desc + '-' + tempds.prodn_practice_desc + '-' + tempds.util_practice_desc;
+        tmp4:=tempds.sub_record(statisticcat_desc = 'AREA PLANTED');
+        SELF.AREA_PLANTED := tmp4[1].value;
+        SELF.unit_AREA_PLANTED := tmp4[1].unit_desc;
+        tmpCrop:= tempds.commodity_desc + '-' + tempds.class_desc + '-' + tempds.util_practice_desc;
         SELF.crop :=  STD.Str.CleanSpaces(tmpCrop);
         SELF := tempds;
 END;
 fds := PROJECT(tempDs, reshape(LEFT));
 
-OUTPUT(fds,,'~test::usda::hierarchy6::county::annual::corn_wheat_barley_hay_Formatted',thor,overwrite);
+OUTPUT(fds,,'~test::usda::hierarchy6::state::annual::corn_wheat_barley_hay_Formatted',thor,overwrite);
 
 // ---------------------------------------------
 
