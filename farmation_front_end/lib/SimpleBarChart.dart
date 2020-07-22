@@ -193,29 +193,6 @@ class _SimpleBarChartList extends State<SimpleBarChartList> {
     }
   }
 
-  // Future<List<Product>> getNewData(Product item, String state) async {
-  //   switch (widget.dataIndicator) {
-  //     case constc.STATE_ANNUAL_CROP:
-  //       return await getProducts(widget.dataIndicator, item.crop, state);
-  //       break;
-  //     case constc.STATE_MONTHLY_CROP:
-  //       return await getProducts(widget.dataIndicator,
-  //           ((item) as StateMonthlyCropProduct).crop, state);
-  //       break;
-  //     case constc.ECONOMICS_ANNUAL_AG_LAND:
-  //       return await getProducts(widget.dataIndicator,
-  //           ((item) as EconomicsAnnualAGLandProduct).crop, state);
-  //       break;
-  //     case constc.ECONOMICS_ANNUAL_INCOME:
-  //       return await getProducts(widget.dataIndicator,
-  //           ((item) as EconomicsAnnualIncomeProduct).crop, state);
-  //       break;
-  //     default:
-  //       return await getProducts(widget.dataIndicator,
-  //           ((item) as StateAnnualCropProduct).crop, state);
-  //   }
-  // }
-
   List<Tab> getMyTabs(int dataIndicator) {
     switch (dataIndicator) {
       case STATE_ANNUAL_CROP:

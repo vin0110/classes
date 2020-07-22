@@ -5,19 +5,6 @@ import 'dart:convert';
 import 'package:farmation_front_end/products/Product.dart';
 import 'package:farmation_front_end/Constants.dart';
 
-const Map QUERIES = {
-  STATE_ANNUAL_CROP: 'fetchquery',
-  STATE_MONTHLY_CROP: 'state_monthly',
-  ECONOMICS_ANNUAL_INCOME: 'economics_getincome',
-  ECONOMICS_ANNUAL_AG_LAND: 'economics_getagland'
-};
-const Map VARIANTS = {
-  STATE_ANNUAL_CROP: 'getcroplist',
-  STATE_MONTHLY_CROP: 'state_monthly_crop_list',
-  ECONOMICS_ANNUAL_INCOME: 'economics_getincomevariantsbystate',
-  ECONOMICS_ANNUAL_AG_LAND: 'economics_getaglandvariantsbystate'
-};
-
 List<Product> parseProducts(int dataIndicator, String responseBody) {
   // print(responseBody);
   dynamic tmp = json.decode(responseBody);
