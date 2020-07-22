@@ -1,6 +1,6 @@
+import 'package:farmation_front_end/VariantsList.dart';
 import 'package:flutter/material.dart';
 
-// import 'package:farmation_front_end/products/Product.dart';
 import 'package:farmation_front_end/Endpoint/endpoint.dart';
 
 import 'SimpleBarChart.dart';
@@ -189,51 +189,16 @@ class Listwidget extends StatelessWidget {
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
               return snapshot.hasData
-                  ? BoxList(
+                  ? VariantsList(
                       crops: snapshot.data,
                       state: state,
                       dataIndicator: dataIndicator,
-                    )
+                      isPopup: false)
                   // return the ListView widget :
                   : Center(child: CircularProgressIndicator());
             },
           ),
         ));
-  }
-}
-
-class BoxList extends StatelessWidget {
-  final List<String> crops;
-  final String state;
-  final int dataIndicator;
-  BoxList({Key key, this.crops, this.state, this.dataIndicator});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: crops.length,
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      itemBuilder: (context, index) {
-        return GestureDetector(
-          child: Text(crops[index]),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                // builder: (context) => ProductPage(item: items[index]),
-                builder: (context) => SimpleBarChart(
-                  crops: getProducts(dataIndicator, crops[index], state),
-                  animate: true,
-                  crop: crops[index],
-                  dataIndicator: dataIndicator,
-                ),
-                // builder: (context) => PiePage(items),
-              ),
-            );
-          },
-        );
-      },
-    );
   }
 }
 
