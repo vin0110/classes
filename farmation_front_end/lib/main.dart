@@ -1,4 +1,5 @@
 import 'package:farmation_front_end/VariantsList.dart';
+import 'package:farmation_front_end/products/Args.dart';
 import 'package:flutter/material.dart';
 
 import 'package:farmation_front_end/Endpoint/endpoint.dart';
@@ -19,12 +20,19 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      // routes: {
+      //   MyHomePage.route: (context) =>
+      //       MyHomePage(title: 'Farmation Demo Home Page'),
+      //   ListwidgetRouteHolder.route: (context) => ListwidgetRouteHolder()
+      // },
       home: MyHomePage(title: 'Flutter Demo Home Page'),
+      // initialRoute: MyHomePage.route,
     );
   }
 }
 
 class MyHomePage extends StatelessWidget {
+  static const String route = '/abc';
   MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
@@ -133,10 +141,50 @@ class MyHomePage extends StatelessWidget {
                       'Continue to Annual Economic Agricultural Land data'),
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: RaisedButton(
+                  onPressed: () {
+                    if (_formKey.currentState.validate()) {
+                      // Navigator.pushNamed(context, '/variants',
+                      //     arguments: Args(
+                      //         state: stateController.text, dataIndicator: EXP));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Listwidget(
+                                  crops:
+                                      fetchVariants(EXP, stateController.text),
+                                  state: stateController.text,
+                                  dataIndicator: EXP)));
+                    }
+                  },
+                  child: Text('Continue to County level Annual data'),
+                ),
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class ListwidgetRouteHolder extends StatelessWidget {
+  static const String route = '/variants';
+  @override
+  Widget build(BuildContext context) {
+    Args args = ModalRoute.of(context).settings.arguments;
+    Future<List<String>> crops = fetchVariants(args.dataIndicator, args.state);
+    // fetchVariants(args['dataIndicator'], args['state']);
+    // print(args.dataIndicator);
+    // print(args.state);
+    return Listwidget(
+      crops: crops,
+      dataIndicator: args.dataIndicator,
+      state: args.state,
+      // dataIndicator: args['dataIndicator'],
+      // state: args['state'],
     );
   }
 }
@@ -161,7 +209,10 @@ class Listwidget extends StatelessWidget {
           child: FutureBuilder<List<String>>(
             future: crops,
             builder: (context, snapshot) {
-              if (snapshot.hasError) print(snapshot.error);
+              if (snapshot.hasError) {
+                print('this error');
+                print(snapshot.error);
+              }
               return snapshot.hasData
                   ? VariantsList(
                       crops: snapshot.data,
