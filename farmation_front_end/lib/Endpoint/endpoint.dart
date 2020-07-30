@@ -4,9 +4,9 @@ import 'dart:convert';
 
 import 'package:farmation_front_end/products/Product.dart';
 import 'package:farmation_front_end/Constants.dart';
+import 'package:flutter/foundation.dart';
 
 List<Product> parseProducts(int dataIndicator, String responseBody) {
-  // print(responseBody);
   dynamic tmp = json.decode(responseBody);
   final parsed = tmp['${QUERIES[dataIndicator]}Response']['Results']['Result 1']
           ['Row']
@@ -32,7 +32,16 @@ List<Product> parseProducts(int dataIndicator, String responseBody) {
           .map<EconomicsAnnualAGLandProduct>(
               (jsonobj) => EconomicsAnnualAGLandProduct.fromJson(jsonobj))
           .toList();
+    case EXP:
+      return parsed
+          .map<StateAnnualCropProduct>(
+              (jsonobj) => StateAnnualCropProduct.fromJson(jsonobj))
+          .toList();
   }
+}
+
+List<Product> parseProducts1(String responseBody) {
+  return parseProducts(EXP, responseBody);
 }
 
 Future<List<Product>> getProducts(
@@ -42,6 +51,7 @@ Future<List<Product>> getProducts(
       body: {'submit_type': 'json', 'crop': crop, 'state': state});
   if (response.statusCode == 200) {
     return parseProducts(dataIndicator, response.body);
+    // compute(parseProducts1, response.body);
   } else {
     throw Exception('Unable to fetch products from the REST API');
   }
@@ -60,7 +70,6 @@ Future<List<String>> fetchVariants(int dataIndicator, String state) async {
 }
 
 List<String> parseVariants(int dataIndicator, String responseBody) {
-  // print(responseBody);
   dynamic tmp = json.decode(responseBody);
   final parsed = tmp['${VARIANTS[dataIndicator]}Response']['Results']
           ['Result 1']['Row']

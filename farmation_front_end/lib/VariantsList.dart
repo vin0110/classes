@@ -1,6 +1,8 @@
+import 'package:farmation_front_end/GridGraphs.dart';
 import 'package:farmation_front_end/SimpleBarChart.dart';
 import 'package:flutter/material.dart';
 
+import 'Constants.dart';
 import 'Endpoint/endpoint.dart';
 
 class VariantsList extends StatelessWidget {
@@ -40,13 +42,18 @@ class VariantsList extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        // builder: (context) => ProductPage(item: items[index]),
-        builder: (context) => SimpleBarChart(
-          crops: getProducts(dataIndicator, crops[index], state),
-          animate: true,
-          crop: crops[index],
-          dataIndicator: dataIndicator,
-        ),
+        builder: (context) => EXP == dataIndicator
+            ? GridGraphs(
+                animate: false,
+                dataIndicator: dataIndicator,
+                items: getProducts(dataIndicator, crops[index], state),
+              )
+            : SimpleBarChart(
+                crops: getProducts(dataIndicator, crops[index], state),
+                animate: true,
+                crop: crops[index],
+                dataIndicator: dataIndicator,
+              ),
         // builder: (context) => PiePage(items),
       ),
     );
