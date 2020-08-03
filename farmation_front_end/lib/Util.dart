@@ -267,15 +267,23 @@ createAnnualCountyDataForGrid(
               ));
         },
         child: IgnorePointer(
-            child: charts.TimeSeriesChart(
-          _createAnnualCountyDataInstance(i, [element], comparisonMode),
-          animate: false,
-        )),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+              Expanded(
+                  flex: 3,
+                  child: (charts.TimeSeriesChart(
+                    _createAnnualCountyDataInstance(
+                        i, [element], comparisonMode),
+                    animate: false,
+                  ))),
+              Expanded(child: Text(element.first ?? element.first.county))
+            ])),
       ));
     });
     GridView grid = GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 10, childAspectRatio: 1.5),
+          crossAxisCount: 10, childAspectRatio: 1),
       itemBuilder: (context, index) => cells[index],
       itemCount: cells.length,
     );
