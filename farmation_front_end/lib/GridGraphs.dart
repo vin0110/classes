@@ -100,7 +100,7 @@ class _GridView extends StatelessWidget {
           key: key,
           controller: tabctrl,
           children: createAnnualCountyDataForGrid(animate, itemsListByCounty,
-              dataIndicator, COMPARISON_MODE_NONE, context, tabctrl, key),
+              dataIndicator, COMPARISON_MODE_NONE, context, tabctrl),
           // getChildren(
           //     dataIndicator, animate, itemsListByCounty, COMPARISON_MODE_NONE),
         ));
