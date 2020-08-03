@@ -244,27 +244,27 @@ createAnnualCountyDataForGrid(
     int dataIndicator,
     int comparisonMode,
     BuildContext context,
-    TabController tabctrl,
-    Key key) {
+    TabController tabctrl) {
   List<Tab> tabs = getMyTabs(dataIndicator);
   List<Widget> widgets = [];
   for (int i = 1; i <= tabs.length; i++) {
     List<Widget> cells = [];
     items.forEach((element) {
       cells.add(InkWell(
-        onTap: () {
-          return Navigator.push(
+        onTap: () async {
+          int index = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => SimpleBarChart(
-                  key: key,
+                  // key: key,
                   dataIndicator: dataIndicator,
                   crop: element[0].crop,
                   animate: true,
                   crops: Future<List<Product>>.value(element),
-                  tabController: tabctrl,
+                  tabControllerIdx: tabctrl.index,
                 ),
               ));
+          tabctrl.index = index ?? 0;
         },
         child: IgnorePointer(
             child: Column(
@@ -277,7 +277,7 @@ createAnnualCountyDataForGrid(
                         i, [element], comparisonMode),
                     animate: false,
                   ))),
-              Expanded(child: Text(element.first ?? element.first.county))
+              Expanded(child: Text(element.first?.county))
             ])),
       ));
     });
