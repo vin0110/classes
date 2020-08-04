@@ -14,6 +14,7 @@ class SimpleBarChart extends StatelessWidget {
   final String crop;
   final bool animate;
   final int dataIndicator;
+  List<List<Product>> allCountiesData;
   // final int tabControllerIdx;
 
   SimpleBarChart(
@@ -22,7 +23,8 @@ class SimpleBarChart extends StatelessWidget {
       this.crops,
       this.crop,
       this.dataIndicator,
-      int tabControllerIdx})
+      int tabControllerIdx,
+      this.allCountiesData})
       : super(key: key) {
     tabIndex = tabControllerIdx ?? 0;
   }
@@ -32,7 +34,7 @@ class SimpleBarChart extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
             leading: IconButton(
-              icon: Icon(Icons.chevron_left),
+              icon: Icon(Icons.arrow_back),
               onPressed: () => Navigator.pop(context, tabIndex),
             ),
             title: Text('Trends for "' + crop.trim() + '"')),
@@ -47,6 +49,7 @@ class SimpleBarChart extends StatelessWidget {
                       items: [snapshot.data],
                       animate: animate,
                       dataIndicator: dataIndicator,
+                      allCountiesData: allCountiesData,
                       // tabctrlIdx: tabControllerIdx,
                     )
                   : Center(child: CircularProgressIndicator());
@@ -60,9 +63,15 @@ class SimpleBarChartList extends StatefulWidget {
   final List<List<Product>> items;
   final int dataIndicator;
   final bool animate;
+  List<List<Product>> allCountiesData;
   // final int tabctrlIdx;
 
-  SimpleBarChartList({this.items, this.animate, this.dataIndicator, Key key})
+  SimpleBarChartList(
+      {this.items,
+      this.animate,
+      this.dataIndicator,
+      Key key,
+      this.allCountiesData})
       : super(key: key);
 
   @override
@@ -73,18 +82,17 @@ class _SimpleBarChartList extends State<SimpleBarChartList>
     with SingleTickerProviderStateMixin {
   int comparisonMode = COMPARISON_MODE_NONE;
   void addState(String state) async {
-    if (comparisonMode == COMPARISON_MODE_CROP) return;
+    if (comparisonMode == COMPARISON_MODE_WHAT) return;
     List<Product> newData =
         await getProducts(widget.dataIndicator, widget.items[0][0].crop, state);
     widget.items.add(newData);
     setState(() {
-      comparisonMode = COMPARISON_MODE_STATE;
-      print('refreshed');
+      comparisonMode = COMPARISON_MODE_WHERE;
     });
   }
 
   void addCrop(String state, newCrop, String county) async {
-    if (comparisonMode == COMPARISON_MODE_STATE) return;
+    if (comparisonMode == COMPARISON_MODE_WHERE) return;
     List<Product> newData =
         await getProducts(widget.dataIndicator, newCrop, state);
     county == null
@@ -92,8 +100,16 @@ class _SimpleBarChartList extends State<SimpleBarChartList>
         : widget.items
             .add(newData.where((element) => element.county == county).toList());
     setState(() {
-      comparisonMode = COMPARISON_MODE_CROP;
-      print('refreshed');
+      comparisonMode = COMPARISON_MODE_WHAT;
+    });
+  }
+
+  void addCounty(String county) async {
+    if (comparisonMode == COMPARISON_MODE_WHAT) return;
+    widget.items.add(widget.allCountiesData
+        .firstWhere((element) => element.first.county == county));
+    setState(() {
+      comparisonMode = COMPARISON_MODE_WHERE;
     });
   }
 
@@ -148,44 +164,65 @@ class _SimpleBarChartList extends State<SimpleBarChartList>
             )),
         Row(
           children: <Widget>[
-            SizedBox(
-                width: MediaQuery.of(context).size.width / 4,
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                    hintText: 'Enter state to compare with',
-                  ),
-                  controller: stateController,
-                )),
+            widget.dataIndicator == EXP
+                ? null
+                : SizedBox(
+                    width: MediaQuery.of(context).size.width / 4,
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        hintText: 'Enter state to compare with',
+                      ),
+                      controller: stateController,
+                    )),
             // Padding(
             //   padding: const EdgeInsets.symmetric(vertical: 16.0),
             //   child:
             RaisedButton(
-              onPressed: comparisonMode != COMPARISON_MODE_CROP
+              onPressed: comparisonMode != COMPARISON_MODE_WHAT
                   ? () {
-                      addState(stateController.text);
+                      widget.dataIndicator == EXP
+                          ? showCountiesAndUpdateGraph(context)
+                          : addState(stateController.text);
                     }
                   : null,
-              child: Text('Compare'),
+              child: Text('Compare with other locations'),
             ),
             // ),
             // Padding(
             //   padding: const EdgeInsets.symmetric(vertical: 16.0),
             //   child:
             RaisedButton(
-              onPressed: comparisonMode != COMPARISON_MODE_STATE
+              onPressed: comparisonMode != COMPARISON_MODE_WHERE
                   ? () => showVariantsAndUpdateGraph(context)
                   : null,
               child: Text('Compare with other crops'),
             ),
             // ),
-          ],
+          ].where((t) => t != null).toList(),
         ),
       ],
     );
   }
 
+  Future showCountiesAndUpdateGraph(BuildContext context) async {
+    if (comparisonMode == COMPARISON_MODE_WHERE) return;
+
+    List<String> countyList =
+        widget.allCountiesData.map((e) => e.first.county).toList();
+    String newCounty = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: const Text('Select other county to compare with'),
+            children: <Widget>[VariantsList(crops: countyList, isPopup: true)],
+          );
+        });
+    addCounty(newCounty);
+    return;
+  }
+
   Future showVariantsAndUpdateGraph(BuildContext context) async {
-    if (comparisonMode == COMPARISON_MODE_STATE) return;
+    if (comparisonMode == COMPARISON_MODE_WHERE) return;
 
     Future<List<String>> data =
         fetchVariants(widget.dataIndicator, widget.items[0][0].state_alpha);
