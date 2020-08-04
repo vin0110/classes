@@ -7,8 +7,8 @@ const int EXP = 5;
 const String ENDPOINT_URL = 'http://152.46.18.172:8000/esp/';
 
 const int COMPARISON_MODE_NONE = 0;
-const int COMPARISON_MODE_STATE = 1;
-const int COMPARISON_MODE_CROP = 2;
+const int COMPARISON_MODE_WHERE = 1;
+const int COMPARISON_MODE_WHAT = 2;
 
 const Map QUERIES = {
   STATE_ANNUAL_CROP: 'fetchquery',

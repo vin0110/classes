@@ -64,7 +64,7 @@ List<charts.Series<StateAnnualCropProduct, DateTime>>
   for (var stateData in items) {
     charts.Series<StateAnnualCropProduct, DateTime> data =
         new charts.Series<StateAnnualCropProduct, DateTime>(
-      id: comparisonMode != COMPARISON_MODE_CROP
+      id: comparisonMode != COMPARISON_MODE_WHAT
           ? stateData[0].state_alpha
           : stateData[0].crop.trim(),
       // colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
@@ -90,7 +90,7 @@ List<charts.Series<StateMonthlyCropProduct, DateTime>>
   for (var stateData in items) {
     charts.Series<StateMonthlyCropProduct, DateTime> data =
         new charts.Series<StateMonthlyCropProduct, DateTime>(
-      id: comparisonMode != COMPARISON_MODE_CROP
+      id: comparisonMode != COMPARISON_MODE_WHAT
           ? stateData[0].state_alpha
           : stateData[0].crop.trim(),
       // colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
@@ -112,7 +112,7 @@ List<charts.Series<EconomicsAnnualIncomeProduct, DateTime>>
   for (var stateData in items) {
     charts.Series<EconomicsAnnualIncomeProduct, DateTime> data =
         new charts.Series<EconomicsAnnualIncomeProduct, DateTime>(
-      id: comparisonMode != COMPARISON_MODE_CROP
+      id: comparisonMode != COMPARISON_MODE_WHAT
           ? stateData[0].state_alpha
           : stateData[0].crop.trim(),
       // colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
@@ -134,7 +134,7 @@ List<charts.Series<EconomicsAnnualAGLandProduct, DateTime>>
   for (var stateData in items) {
     charts.Series<EconomicsAnnualAGLandProduct, DateTime> data =
         new charts.Series<EconomicsAnnualAGLandProduct, DateTime>(
-      id: comparisonMode != COMPARISON_MODE_CROP
+      id: comparisonMode != COMPARISON_MODE_WHAT
           ? stateData[0].state_alpha
           : stateData[0].crop.trim(),
       // colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
@@ -156,7 +156,7 @@ List<charts.Series<StateAnnualCropProduct, DateTime>>
   for (var stateData in items) {
     charts.Series<StateAnnualCropProduct, DateTime> data =
         new charts.Series<StateAnnualCropProduct, DateTime>(
-      id: comparisonMode != COMPARISON_MODE_CROP
+      id: comparisonMode != COMPARISON_MODE_WHAT
           ? stateData[0].county
           : stateData[0].crop.trim(),
       // colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
@@ -186,7 +186,7 @@ createAnnualCropData(bool animate, List<List<Product>> items, int dataIndicator,
       animate: animate,
       behaviors: [
         new charts.SeriesLegend(
-            desiredMaxColumns: comparisonMode != COMPARISON_MODE_CROP ? 5 : 2)
+            desiredMaxColumns: comparisonMode != COMPARISON_MODE_WHAT ? 5 : 2)
       ],
     ));
 
@@ -262,6 +262,7 @@ createAnnualCountyDataForGrid(
                   animate: true,
                   crops: Future<List<Product>>.value(element),
                   tabControllerIdx: tabctrl.index,
+                  allCountiesData: items,
                 ),
               ));
           tabctrl.index = index ?? 0;
@@ -304,7 +305,7 @@ createAnnualCountyData(bool animate, List<List<Product>> items,
       animate: animate,
       behaviors: [
         new charts.SeriesLegend(
-            desiredMaxColumns: comparisonMode != COMPARISON_MODE_CROP ? 5 : 2)
+            desiredMaxColumns: comparisonMode != COMPARISON_MODE_WHAT ? 5 : 2)
       ],
     ));
 
