@@ -13,12 +13,15 @@ class VariantsList extends StatelessWidget {
   VariantsList(
       {Key key, this.crops, this.state, this.dataIndicator, this.isPopup});
   ScrollController ctrl = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     return Scrollbar(
         controller: ctrl,
         isAlwaysShown: true,
         child: Container(
+            // color: Colors.blue,
+            padding: const EdgeInsets.only(left: 16),
             height: MediaQuery.of(context).size.height * 1 / 2,
             width: MediaQuery.of(context).size.width * 3 / 4,
             child: ListView.builder(
@@ -39,6 +42,7 @@ class VariantsList extends StatelessWidget {
   }
 
   void pushToNewScreen(BuildContext context, int index) {
+    var products = getProducts(dataIndicator, crops[index], state);
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -46,10 +50,10 @@ class VariantsList extends StatelessWidget {
             ? GridGraphs(
                 animate: false,
                 dataIndicator: dataIndicator,
-                items: getProducts(dataIndicator, crops[index], state),
+                items: products,
               )
             : SimpleBarChart(
-                crops: getProducts(dataIndicator, crops[index], state),
+                crops: products,
                 animate: true,
                 crop: crops[index],
                 dataIndicator: dataIndicator,

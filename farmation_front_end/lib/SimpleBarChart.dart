@@ -14,7 +14,7 @@ class SimpleBarChart extends StatelessWidget {
   final String crop;
   final bool animate;
   final int dataIndicator;
-  List<List<Product>> allCountiesData;
+  final List<List<Product>> allData;
   // final int tabControllerIdx;
 
   SimpleBarChart(
@@ -24,7 +24,7 @@ class SimpleBarChart extends StatelessWidget {
       this.crop,
       this.dataIndicator,
       int tabControllerIdx,
-      this.allCountiesData})
+      this.allData})
       : super(key: key) {
     tabIndex = tabControllerIdx ?? 0;
   }
@@ -49,7 +49,7 @@ class SimpleBarChart extends StatelessWidget {
                       items: [snapshot.data],
                       animate: animate,
                       dataIndicator: dataIndicator,
-                      allCountiesData: allCountiesData,
+                      allData: allData,
                       // tabctrlIdx: tabControllerIdx,
                     )
                   : Center(child: CircularProgressIndicator());
@@ -63,15 +63,11 @@ class SimpleBarChartList extends StatefulWidget {
   final List<List<Product>> items;
   final int dataIndicator;
   final bool animate;
-  List<List<Product>> allCountiesData;
+  final List<List<Product>> allData;
   // final int tabctrlIdx;
 
   SimpleBarChartList(
-      {this.items,
-      this.animate,
-      this.dataIndicator,
-      Key key,
-      this.allCountiesData})
+      {this.items, this.animate, this.dataIndicator, Key key, this.allData})
       : super(key: key);
 
   @override
@@ -81,10 +77,16 @@ class SimpleBarChartList extends StatefulWidget {
 class _SimpleBarChartList extends State<SimpleBarChartList>
     with SingleTickerProviderStateMixin {
   int comparisonMode = COMPARISON_MODE_NONE;
+
   void addState(String state) async {
     if (comparisonMode == COMPARISON_MODE_WHAT) return;
     List<Product> newData =
         await getProducts(widget.dataIndicator, widget.items[0][0].crop, state);
+    if (newData == null || newData.isEmpty) {
+      Scaffold.of(context)
+          .showSnackBar(SnackBar(content: Text('No data found')));
+      return;
+    }
     widget.items.add(newData);
     setState(() {
       comparisonMode = COMPARISON_MODE_WHERE;
@@ -106,8 +108,8 @@ class _SimpleBarChartList extends State<SimpleBarChartList>
 
   void addCounty(String county) async {
     if (comparisonMode == COMPARISON_MODE_WHAT) return;
-    widget.items.add(widget.allCountiesData
-        .firstWhere((element) => element.first.county == county));
+    widget.items.add(
+        widget.allData.firstWhere((element) => element.first.county == county));
     setState(() {
       comparisonMode = COMPARISON_MODE_WHERE;
     });
@@ -143,8 +145,8 @@ class _SimpleBarChartList extends State<SimpleBarChartList>
         TabBar(
           key: widget.key,
           controller: tabctrl,
-          indicatorColor: Colors.blue,
-          labelColor: Colors.blue,
+          indicatorColor: Theme.of(context).primaryColor,
+          labelColor: Theme.of(context).primaryColor,
           unselectedLabelColor: Colors.red,
           tabs: getMyTabs(widget.dataIndicator),
           onTap: (num) {
@@ -162,44 +164,46 @@ class _SimpleBarChartList extends State<SimpleBarChartList>
               children: getChildren(widget.dataIndicator, widget.animate,
                   widget.items, comparisonMode),
             )),
-        Row(
-          children: <Widget>[
-            widget.dataIndicator == EXP
-                ? null
-                : SizedBox(
-                    width: MediaQuery.of(context).size.width / 4,
-                    child: TextFormField(
-                      decoration: const InputDecoration(
-                        hintText: 'Enter state to compare with',
-                      ),
-                      controller: stateController,
-                    )),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(vertical: 16.0),
-            //   child:
-            RaisedButton(
-              onPressed: comparisonMode != COMPARISON_MODE_WHAT
-                  ? () {
-                      widget.dataIndicator == EXP
-                          ? showCountiesAndUpdateGraph(context)
-                          : addState(stateController.text);
-                    }
-                  : null,
-              child: Text('Compare with other locations'),
-            ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(vertical: 16.0),
-            //   child:
-            RaisedButton(
-              onPressed: comparisonMode != COMPARISON_MODE_WHERE
-                  ? () => showVariantsAndUpdateGraph(context)
-                  : null,
-              child: Text('Compare with other crops'),
-            ),
-            // ),
-          ].where((t) => t != null).toList(),
-        ),
+        Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              children: <Widget>[
+                widget.dataIndicator == EXP
+                    ? null
+                    : SizedBox(
+                        width: MediaQuery.of(context).size.width / 4,
+                        child: TextFormField(
+                          decoration: const InputDecoration(
+                            hintText: 'Enter state to compare with',
+                          ),
+                          controller: stateController,
+                        )),
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(vertical: 16.0),
+                //   child:
+                RaisedButton(
+                  onPressed: comparisonMode != COMPARISON_MODE_WHAT
+                      ? () {
+                          widget.dataIndicator == EXP
+                              ? showCountiesAndUpdateGraph(context)
+                              : addState(stateController.text);
+                        }
+                      : null,
+                  child: Text('Compare with other locations'),
+                ),
+                // ),
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(vertical: 16.0),
+                //   child:
+                RaisedButton(
+                  onPressed: comparisonMode != COMPARISON_MODE_WHERE
+                      ? () => showVariantsAndUpdateGraph(context)
+                      : null,
+                  child: Text('Compare with other crops'),
+                ),
+                // ),
+              ].where((t) => t != null).toList(),
+            )),
       ],
     );
   }
@@ -208,7 +212,7 @@ class _SimpleBarChartList extends State<SimpleBarChartList>
     if (comparisonMode == COMPARISON_MODE_WHERE) return;
 
     List<String> countyList =
-        widget.allCountiesData.map((e) => e.first.county).toList();
+        widget.allData.map((e) => e.first.county).toList();
     String newCounty = await showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -235,6 +239,7 @@ class _SimpleBarChartList extends State<SimpleBarChartList>
               FutureBuilder<List<String>>(
                 future: data,
                 builder: (context, snapshot) {
+                  // Error due to wrong user input not happening here so not handling
                   if (snapshot.hasError) print(snapshot.error);
                   return snapshot.hasData
                       ? VariantsList(
