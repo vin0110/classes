@@ -48,8 +48,8 @@ class _GridGraphs extends State<GridGraphs>
           children: <Widget>[
             TabBar(
               controller: tabctrl,
-              indicatorColor: Colors.blue,
-              labelColor: Colors.blue,
+              indicatorColor: Theme.of(context).primaryColor,
+              labelColor: Theme.of(context).primaryColor,
               unselectedLabelColor: Colors.red,
               tabs: getMyTabs(dataIndicator),
             ),

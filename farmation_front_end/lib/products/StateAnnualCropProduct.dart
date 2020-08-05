@@ -45,7 +45,7 @@ class StateAnnualCropProduct extends Product {
         data['yield'],
         data['unit_yield'],
         data['area_planted'] == null || data['area_planted'] == 0
-            ? 0
+            ? 1
             : data['area_harvested'] / data['area_planted'],
         data['unit_area_planted'],
         data['county_name']);

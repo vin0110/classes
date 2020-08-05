@@ -262,7 +262,7 @@ createAnnualCountyDataForGrid(
                   animate: true,
                   crops: Future<List<Product>>.value(element),
                   tabControllerIdx: tabctrl.index,
-                  allCountiesData: items,
+                  allData: items,
                 ),
               ));
           tabctrl.index = index ?? 0;
