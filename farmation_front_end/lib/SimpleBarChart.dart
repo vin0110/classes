@@ -189,7 +189,8 @@ class _SimpleBarChartList extends State<SimpleBarChartList>
                               : addState(stateController.text);
                         }
                       : null,
-                  child: Text('Compare with other locations'),
+                  child:
+                      Text(getWhereComparisonButtonText(widget.dataIndicator)),
                 ),
                 // ),
                 // Padding(
@@ -256,5 +257,11 @@ class _SimpleBarChartList extends State<SimpleBarChartList>
         });
     addCrop(widget.items[0][0].state_alpha, newCrop, widget.items[0][0].county);
     return;
+  }
+
+  String getWhereComparisonButtonText(int dataIndicator) {
+    return dataIndicator == EXP
+        ? 'Compare with other counties'
+        : 'Compare with other states';
   }
 }
