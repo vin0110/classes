@@ -9,6 +9,8 @@ abstract class Product {
   final String state_alpha;
   final String crop;
   final int year;
+  final String prodPractise;
   final String county;
-  Product(this.state_alpha, this.crop, this.year, {this.county});
+  Product(this.state_alpha, this.crop, this.year,
+      {this.county, this.prodPractise});
 }
