@@ -15,12 +15,12 @@ const Map QUERIES = {
   STATE_MONTHLY_CROP: 'state_monthly',
   ECONOMICS_ANNUAL_INCOME: 'economics_getincome',
   ECONOMICS_ANNUAL_AG_LAND: 'economics_getagland',
-  EXP: 'state_annual_by_county'
+  EXP: 'fetchquery3'
 };
 const Map VARIANTS = {
   STATE_ANNUAL_CROP: 'getcroplist1',
   STATE_MONTHLY_CROP: 'state_monthly_crop_list',
   ECONOMICS_ANNUAL_INCOME: 'economics_getincomevariantsbystate',
   ECONOMICS_ANNUAL_AG_LAND: 'economics_getaglandvariantsbystate',
-  EXP: 'getCountyVariantsByState'
+  EXP: 'getcroplist2'
 };
