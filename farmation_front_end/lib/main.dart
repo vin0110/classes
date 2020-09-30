@@ -17,7 +17,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'NASS data view',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: MaterialColor(0xFFCC0000, {
+          50: Color(0xFFCC0000),
+          100: Color(0xFFCC0000),
+          200: Color(0xFFCC0000),
+          300: Color(0xFFCC0000),
+          400: Color(0xFFCC0000),
+          500: Color(0xFFCC0000),
+          600: Color(0xFFCC0000),
+          700: Color(0xFFCC0000),
+          800: Color(0xFFCC0000),
+          900: Color(0xFFCC0000),
+        }),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       // routes: {

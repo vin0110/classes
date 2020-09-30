@@ -210,8 +210,7 @@ class _SimpleBarChartList extends State<SimpleBarChartList>
   }
 
   Future showCountiesAndUpdateGraph(BuildContext context) async {
-    if (comparisonMode == COMPARISON_MODE_WHERE) return;
-
+    if (comparisonMode == COMPARISON_MODE_WHAT) return;
     List<String> countyList =
         widget.allData.map((e) => e.first.county).toList();
     String newCounty = await showDialog(
