@@ -29,10 +29,8 @@ class StateAnnualCropProduct extends Product {
       this.unitYield,
       this.areaPlanted,
       this.unitAreaPlanted,
-      String county,
-      String prodPractise)
-      : super(state_alpha, crop, year,
-            county: county, prodPractise: prodPractise);
+      String county)
+      : super(state_alpha, crop, year, county: county);
 
   @override
   factory StateAnnualCropProduct.fromJson(Map<String, dynamic> data) {
@@ -50,7 +48,6 @@ class StateAnnualCropProduct extends Product {
             ? 1
             : data['area_harvested'] / data['area_planted'],
         data['unit_area_planted'],
-        data['county_name'],
-        data['prodn_practice_desc']);
+        data['county_name']);
   }
 }

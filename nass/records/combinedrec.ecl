@@ -5,7 +5,7 @@ export combinedrec := RECORD
 	// $.QuickstatsRecord.reference_period_desc;//
     $.QuickstatsRecord.state_alpha;
 	// $.QuickStatsRecord.county_name;
-	$.QuickstatsRecord.prodn_practice_desc;
+	// $.QuickstatsRecord.source_desc;
 
 	string177 crop;
 	// decimal price_received;

@@ -127,7 +127,7 @@ class _SimpleBarChartList extends State<SimpleBarChartList>
             TabController(
                 length: getMyTabs(widget.dataIndicator).length,
                 vsync: this,
-                initialIndex: 2)
+                initialIndex: tabIndex)
         // : widget.tabctrl
         ;
   }

@@ -1,6 +1,6 @@
-IMPORT $.records;
+IMPORT $.records,std;
 
-filename:= '~test::usda::exp2v';
+filename:= '~test::usda::hierarchy6::state::monthly::crops_list_by_state';
 
 ds := DATASET(filename, 
                 {records.combinedrec,UNSIGNED8 fpos {virtual(fileposition)}},
@@ -8,7 +8,7 @@ ds := DATASET(filename,
 
 STRING2 state := 'NC' :STORED('state');
 
-output(ds(state_alpha=state and entries >= 100),{crop})
+output(ds(state_alpha=state),{crop})
 
 // idx := INDEX(ds,{state_alpha,year,crop,fpos},'~test::usda::hierarchy6::state::annual::corn_wheat_barley_hay_combined_index');
 

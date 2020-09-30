@@ -62,27 +62,23 @@ List<charts.Series<StateAnnualCropProduct, DateTime>>
         int flag, List<List<Product>> items, int comparisonMode) {
   List<charts.Series<StateAnnualCropProduct, DateTime>> retVal = [];
   for (var stateData in items) {
-    Set prodPractises = stateData.map((e) => e.prodPractise).toSet();
-    for (String prodPractise in prodPractises) {
-      List list =
-          stateData.where((e) => e.prodPractise == prodPractise).toList();
-      charts.Series<StateAnnualCropProduct, DateTime> data =
-          new charts.Series<StateAnnualCropProduct, DateTime>(
-        id: comparisonMode != COMPARISON_MODE_WHAT
-            ? list[0].prodPractise.trim()
-            : list[0].prodPractise.trim() + stateData[0].crop.trim(),
-        // colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (StateAnnualCropProduct sales, _) =>
-            new DateTime(sales.year), //.toString(),
-        measureFn: (StateAnnualCropProduct sales, _) => flag == 1
-            ? sales.areaHarvested
-            : flag == 2
-                ? sales.production
-                : flag == 3 ? sales.yieldVal : sales.areaPlanted,
-        data: list,
-      );
-      retVal.add(data);
-    }
+    charts.Series<StateAnnualCropProduct, DateTime> data =
+        new charts.Series<StateAnnualCropProduct, DateTime>(
+      id: comparisonMode != COMPARISON_MODE_WHAT
+          ? stateData[0].state_alpha
+          : stateData[0].crop.trim(),
+      // colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+      domainFn: (StateAnnualCropProduct sales, _) =>
+          new DateTime(sales.year), //.toString(),
+      measureFn: (StateAnnualCropProduct sales, _) => flag == 1
+          ? sales.areaHarvested
+          : flag == 2
+              ? sales.production
+              : flag == 3 ? sales.yieldVal : sales.areaPlanted,
+      data: stateData,
+    );
+
+    retVal.add(data);
   }
   return retVal;
 }
@@ -158,28 +154,23 @@ List<charts.Series<StateAnnualCropProduct, DateTime>>
         int flag, List<List<Product>> items, int comparisonMode) {
   List<charts.Series<StateAnnualCropProduct, DateTime>> retVal = [];
   for (var stateData in items) {
-    Set prodPractises = stateData.map((e) => e.prodPractise).toSet();
-    for (String prodPractise in prodPractises) {
-      List list =
-          stateData.where((e) => e.prodPractise == prodPractise).toList();
-      charts.Series<StateAnnualCropProduct, DateTime> data =
-          new charts.Series<StateAnnualCropProduct, DateTime>(
-        id: comparisonMode != COMPARISON_MODE_WHAT
-            ? list[0].prodPractise.trim()
-            : list[0].prodPractise.trim() + stateData[0].crop.trim(),
-        // colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (StateAnnualCropProduct sales, _) =>
-            new DateTime(sales.year), //.toString(),
-        measureFn: (StateAnnualCropProduct sales, _) => flag == 1
-            ? sales.areaHarvested
-            : flag == 2
-                ? sales.production
-                : flag == 3 ? sales.yieldVal : sales.areaPlanted,
-        data: list,
-      );
+    charts.Series<StateAnnualCropProduct, DateTime> data =
+        new charts.Series<StateAnnualCropProduct, DateTime>(
+      id: comparisonMode != COMPARISON_MODE_WHAT
+          ? stateData[0].county
+          : stateData[0].crop.trim(),
+      // colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+      domainFn: (StateAnnualCropProduct sales, _) =>
+          new DateTime(sales.year), //.toString(),
+      measureFn: (StateAnnualCropProduct sales, _) => flag == 1
+          ? sales.areaHarvested
+          : flag == 2
+              ? sales.production
+              : flag == 3 ? sales.yieldVal : sales.areaPlanted,
+      data: stateData,
+    );
 
-      retVal.add(data);
-    }
+    retVal.add(data);
   }
   return retVal;
 }
@@ -195,7 +186,7 @@ createAnnualCropData(bool animate, List<List<Product>> items, int dataIndicator,
       animate: animate,
       behaviors: [
         new charts.SeriesLegend(
-            desiredMaxColumns: comparisonMode != COMPARISON_MODE_WHAT ? 3 : 2)
+            desiredMaxColumns: comparisonMode != COMPARISON_MODE_WHAT ? 5 : 2)
       ],
     ));
 
@@ -314,7 +305,7 @@ createAnnualCountyData(bool animate, List<List<Product>> items,
       animate: animate,
       behaviors: [
         new charts.SeriesLegend(
-            desiredMaxColumns: comparisonMode != COMPARISON_MODE_WHAT ? 3 : 2)
+            desiredMaxColumns: comparisonMode != COMPARISON_MODE_WHAT ? 5 : 2)
       ],
     ));
 
