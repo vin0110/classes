@@ -4,7 +4,7 @@ import std,$.Records,$.Dictionaries;
 #DECLARE (day)
 #DECLARE (year)
 #SET (SetString, '['); //initialize SetString to [
-#SET (year, 2014); //initialize day to 1
+#SET (year, 2013); //initialize day to 1
 #Loop
     #SET (day, 0); //initialize day to 1
     #IF (%year% > 2020)
@@ -34,35 +34,37 @@ daysOfYears:=project(tds,transform(newrecDate,
                               		self.dom:=std.date.day(dte);
                                    self:=left));
 
-oldDate:= STD.Date.FromStringToDate('2014', '%Y');
+oldDate:= STD.Date.FromStringToDate('2013', '%Y');
 
 rec := RECORD
-    STD.Date.Date_t  date;
-    STRING location_city;
-    STRING field3;
-    STRING commodity;
-    STRING field5;
-    Decimal price;
+	STD.Date.Date_t  date;
+    STRING city;
+    STRING what;
+    STRING crop;
+    STRING value_type;
+    Decimal value;
+    STRING loc;
 END;
 
-fn := '~test::mars::ra_gr110_fixed';
+fn := '~test::mars::ra_gr110';
 ds := Dataset(fn,rec,flat);
 
-ds1:=ds((field5='new'and (commodity='corn' or commodity='soy'))or(field5='cash'and commodity='wheat'));
-marsds:= ds-ds1;
-cityList := sort(TABLE(marsds(date>=20150101),{ location_city,field3,commodity, cnt:=count(group)}, location_city,field3,commodity),-cnt);
+// ds1:=ds((field5='new'and (crop='corn' or crop='soy'))or(field5='cash'and crop='wheat'));
+marsds:= ds;//-ds1;
+cityList := sort(TABLE(marsds(date>=20140101),{ city,what,crop,loc, cnt:=count(group)}, city,what,crop),-cnt);
 
 templateRec := RECORD
 	STD.Date.Date_t  date;
-    STRING20 location_city;
-    STRING10 commodity;
-    STRING10 elevator_feed;
+    STRING20 city;
+    STRING10 crop;
+    STRING10 what;
+    STRING loc;
 END;
-marsTemplate := JOIN(daysOfYears,cityList(cnt>1000), 
+marsTemplate := JOIN(daysOfYears,cityList(cnt>1100), 
  True
  ,transform(templateRec, 
             self.date := STD.Date.DateFromParts(left.year,left.month,left.dom);
-            SELF.elevator_feed:=right.field3;
+            SELF.what:=right.what;
             SELF := right;
 ),LEFT OUTER,ALL);
 
@@ -71,20 +73,21 @@ marsFinalRec:=Record(templateRec)
 end;
 
 marsjoinedds := JOIN(marsTemplate,marsds, 
- left.date=RIGHT.date and left.location_city=right.location_city and left.elevator_feed=right.field3 and left.commodity=right.commodity
+ left.date=RIGHT.date and left.city=right.city and left.what=right.what and left.crop=right.crop
  ,transform(marsFinalRec, 
-            Self.mars:=right.price;
+            Self.mars:=right.value;
             SELF := LEFT;
 ),LEFT OUTER);
 marsFinalRec marsfiller(marsFinalRec prev, marsFinalRec curr):= TRANSFORM
     SELF.date:=curr.date;
-    SELF.location_city:=curr.location_city;
-    SELF.commodity:=curr.commodity;
-    SELF.elevator_feed:=curr.elevator_feed;
+    SELF.city:=curr.city;
+    SELF.crop:=curr.crop;
+    SELF.what:=curr.what;
+    SELF.loc:=curr.loc;
     SELF.mars := IF(curr.mars=0, prev.mars, curr.mars);
 END;
 
-groupedMars:=GROUP(sort(marsjoinedds,location_city,commodity,elevator_feed,date),location_city,commodity,elevator_feed);
+groupedMars:=GROUP(sort(marsjoinedds,city,crop,what,date),city,crop,what);
 marsfullds := ITERATE(sort(groupedMars,date), marsfiller(LEFT,right));
 
 output(sort(marsfullds,date),,'~test::basis::marsPrices',thor,overwrite);
@@ -147,21 +150,22 @@ OUTPUT(sort(cmefullds,date,contractmonth),,'~test::basis::cmePrices',thor,overwr
 
 basisrec := RECORD
 	STD.Date.Date_t  date;
-    STRING20 location_city;
-    STRING10 commodity;
-    STRING10 elevator_feed;
+    STRING20 city;
+    STRING10 crop;
+    STRING10 what;
     Integer2 contractmonth;
-    Decimal relativeBasis;
-    Decimal netBasis;
+    // Decimal relativeBasis;
+    // Decimal netBasis;
+    String30 loc;
+    Decimal mars;
+    Decimal cme;
     Integer1 upcomingContract;
-    // Decimal mars;
-    // Decimal cme;
 END;
 // basisrolluprec := RECORD
 // 	STD.Date.Date_t  date;
-//     STRING20 location_city;
-//     STRING10 commodity;
-//     STRING10 elevator_feed;
+//     STRING20 city;
+//     STRING10 crop;
+//     STRING10 what;
 //     Decimal10_8 contract1Basis;
 //     Decimal10_8 contract2Basis;
 //     Decimal10_8 contract3Basis;
@@ -176,43 +180,43 @@ END;
 crnwt := sort(DATASET([3,5,7,9,12], {Integer2 mnth}),mnth);
 sy := sort(DATASET([3,5,7,9,11], {Integer2 mnth}),mnth);
 
-basisds := JOIN(marsfullds(date>=20150101,date<=20190313),cmefullds(date>=20150101,date<=20190313), 
- LEFT.date=RIGHT.date and LEFT.commodity=Dictionaries.Crop_code_DCT(RIGHT.crop)
+basisds := JOIN(marsfullds(date>=20140101,date<=20190313),cmefullds(date>=20140101,date<=20190313), 
+ LEFT.date=RIGHT.date and LEFT.crop=Dictionaries.Crop_code_DCT(RIGHT.crop)
  ,transform(basisrec, 
-            self.relativeBasis := LEFT.mars/(Right.close/100);
-            self.netBasis := LEFT.mars-(Right.close/100);
-            // self.mars:=left.mars;
-            // self.cme:=right.close/100;
+            // self.relativeBasis := LEFT.mars/(Right.close/100);
+            // self.netBasis := LEFT.mars-(Right.close/100);
+            self.mars:=left.mars;
+            self.cme:=right.close/100;
             self.contractmonth := right.contractmonth;
-            self.elevator_feed := LEFT.elevator_feed;
-            self.upcomingContract:= IF(LEFT.commodity='soybeans', 
+            self.what := LEFT.what;
+            self.upcomingContract:= IF(LEFT.crop='soybeans', 
             IF(STD.Date.Month(left.date)>=11, sy[1].mnth, sy(mnth>STD.Date.Month(left.date))[1].mnth), 
             IF(STD.Date.Month(left.date)=12, crnwt[1].mnth, crnwt(mnth>STD.Date.Month(left.date))[1].mnth));
             
             SELF := LEFT;
 ),INNER);
 
-basisNewRec := RECORD
-	STD.Date.Date_t  date;
-    STRING20 location_city;
-    STRING10 commodity;
-    STRING10 elevator_feed;
-    Integer2 contractmonth;
-    String10 basisType;
-    Decimal basis;
-    Integer1 upcomingContract;
-    // Decimal netBasis;
-END;
+// basisNewRec := RECORD
+// 	STD.Date.Date_t  date;
+//     STRING20 city;
+//     STRING10 crop;
+//     STRING10 what;
+//     Integer2 contractmonth;
+//     String10 basisType;
+//     Decimal basis;
+//     Integer1 upcomingContract;
+//     // Decimal netBasis;
+// END;
 
-basisNormed:=Normalize(basisds,2,
-                            TRANSFORM(basisNewRec, 
-                                        self.basisType:=IF(COUNTER=1, 'net', 'relative');
-                                        self.basis:=IF(counter=1, left.netBasis, left.relativeBasis);
-                                        SELF := LEFT)
-);
-OUTPUT(sort(basisNormed,commodity,location_city,elevator_feed,date),,'~test::basistmp::basis',thor,overwrite);
+// basisNormed:=Normalize(basisds,2,
+//                             TRANSFORM(basisNewRec, 
+//                                         self.basisType:=IF(COUNTER=1, 'net', 'relative');
+//                                         self.basis:=IF(counter=1, left.netBasis, left.relativeBasis);
+//                                         SELF := LEFT)
+// );
+OUTPUT(sort(basisds,crop,city,what,date),,'~test::basistmp::basis',thor,overwrite);
 
-// basisgroup:=GROUP(sort(basisds,date,commodity,location_city,elevator_feed),date,commodity,location_city,elevator_feed);
+// basisgroup:=GROUP(sort(basisds,date,crop,city,what),date,crop,city,what);
 // basisRollup:=ROLLUP(basisgroup,GROUP,
 //     TRANSFORM(basisrolluprec,
 //         subdata := sort(Rows(LEFT),contractmonth);
@@ -225,7 +229,7 @@ OUTPUT(sort(basisNormed,commodity,location_city,elevator_feed,date),,'~test::bas
 //         SELF := subdata[1])
 // );
 
-// OUTPUT(sort(basisRollup,commodity,location_city,elevator_feed,date),,'~test::basistmp::additivebasis',thor,overwrite);
+// OUTPUT(sort(basisRollup,crop,city,what,date),,'~test::basistmp::additivebasis',thor,overwrite);
 
 // relBasisRollup:=ROLLUP(basisgroup,GROUP,
 //     TRANSFORM(basisrolluprec,
@@ -239,26 +243,28 @@ OUTPUT(sort(basisNormed,commodity,location_city,elevator_feed,date),,'~test::bas
 //         SELF := subdata[1])
 // );
 
-// OUTPUT(sort(relBasisRollup,commodity,location_city,elevator_feed,date),,'~test::basistmp::relativebasis',thor,overwrite);
+// OUTPUT(sort(relBasisRollup,crop,city,what,date),,'~test::basistmp::relativebasis',thor,overwrite);
 
 avgRec := RECORD
-    UNSIGNED1   month:=STD.Date.Month(basisNormed.date);
-    UNSIGNED1   day := STD.Date.day(basisNormed.date);
-    UNSIGNED3 dayOfYear := STD.Date.DayOfYear(basisNormed.date);
-    basisNormed.location_city;
-    basisNormed.commodity;
-    basisNormed.contractmonth;
-    basisNormed.elevator_feed;
-    basisNormed.basisType;
-    Decimal averageBasis :=  AVE(GROUP, basisNormed.basis);
-    Decimal10_8 min:=MIN(GROUP, basisNormed.basis);
-    Decimal10_8 max:=MAX(GROUP, basisNormed.basis);
+    UNSIGNED1   month:=STD.Date.Month(basisds.date);
+    UNSIGNED1   day := STD.Date.day(basisds.date);
+    UNSIGNED3 dayOfYear := STD.Date.DayOfYear(basisds.date);
+    basisds.city;
+    basisds.crop;
+    basisds.contractmonth;
+    basisds.what;
+    basisds.loc;
+    // basisds.basisType;
+    Decimal averageCme :=  AVE(GROUP, basisds.cme);
+    Decimal averageMars :=  AVE(GROUP, basisds.mars);
+    // Decimal10_8 min:=MIN(GROUP, basisds.basis);
+    // Decimal10_8 max:=MAX(GROUP, basisds.basis);
     // UNSIGNED1   month:=STD.Date.Month(basisRollup.date);
     // UNSIGNED1   day := STD.Date.day(basisRollup.date);
     // UNSIGNED3 dayOfYear := STD.Date.DayOfYear(basisRollup.date);
-    // basisRollup.location_city;
-    // basisRollup.commodity;
-    // basisRollup.elevator_feed;
+    // basisRollup.city;
+    // basisRollup.crop;
+    // basisRollup.what;
     // Decimal10_8 aveContract1Basis:=AVE(GROUP, basisRollup.contract1Basis);
     // Decimal10_8 minContract1Basis:=MIN(GROUP, basisRollup.contract1Basis);
     // Decimal10_8 maxContract1Basis:=MAX(GROUP, basisRollup.contract1Basis);
@@ -276,28 +282,28 @@ avgRec := RECORD
     // Decimal10_8 maxContract5Basis:=MAX(GROUP, basisRollup.contract5Basis);
 END;
 
-// crossTabDs := TABLE(basisRollup, avgRec, STD.Date.day(date),STD.Date.Month(date),location_city,commodity,elevator_feed);
+// crossTabDs := TABLE(basisRollup, avgRec, STD.Date.day(date),STD.Date.Month(date),city,crop,what);
 // OUTPUT(sort(crossTabDs,month,day),,'~test::basisavtmp::Avg_basis_Additive',thor,overwrite);
-crossTabDs := TABLE(basisNormed, avgRec, STD.Date.day(date),STD.Date.Month(date),location_city,commodity,contractmonth,elevator_feed,basistype);
+crossTabDs := TABLE(basisds, avgRec, STD.Date.day(date),STD.Date.Month(date),city,crop,contractmonth,what);//,basistype);
 OUTPUT(sort(crossTabDs,month,day),,'~test::basisavtmp::Avg_basis',thor,overwrite);
 
 // avgRecRel := RECORD
 //     UNSIGNED1   month:=STD.Date.Month(basisds.date);
 //     UNSIGNED1   day := STD.Date.day(basisds.date);
 //     UNSIGNED3 dayOfYear := STD.Date.DayOfYear(basisds.date);
-//     basisds.location_city;
-//     basisds.commodity;
+//     basisds.city;
+//     basisds.crop;
 //     basisds.contractmonth;
-//     basisds.elevator_feed;
+//     basisds.what;
 //     Decimal averageBasis :=  AVE(GROUP, basisds.relativeBasis);
 //     Decimal10_8 min:=MIN(GROUP, basisds.relativeBasis);
 //     Decimal10_8 max:=MAX(GROUP, basisds.relativeBasis);
 // //     UNSIGNED1   month:=STD.Date.Month(relBasisRollup.date);
 // //     UNSIGNED1   day := STD.Date.day(relBasisRollup.date);
 // //     UNSIGNED3 dayOfYear := STD.Date.DayOfYear(relBasisRollup.date);
-// //     relBasisRollup.location_city;
-// //     relBasisRollup.commodity;
-// //     relBasisRollup.elevator_feed;
+// //     relBasisRollup.city;
+// //     relBasisRollup.crop;
+// //     relBasisRollup.what;
 // //     Decimal10_8 aveContract1Basis:=AVE(GROUP, relBasisRollup.contract1Basis);
 // //     Decimal10_8 minContract1Basis:=MIN(GROUP, relBasisRollup.contract1Basis);
 // //     Decimal10_8 maxContract1Basis:=MAX(GROUP, relBasisRollup.contract1Basis);
@@ -314,7 +320,7 @@ OUTPUT(sort(crossTabDs,month,day),,'~test::basisavtmp::Avg_basis',thor,overwrite
 // //     Decimal10_8 minContract5Basis:=MIN(GROUP, relBasisRollup.contract5Basis);
 // //     Decimal10_8 maxContract5Basis:=MAX(GROUP, relBasisRollup.contract5Basis);
 // END;
-// // crossTabDs2 := TABLE(relBasisRollup, avgRecRel, STD.Date.day(date),STD.Date.Month(date),location_city,commodity,elevator_feed);
+// // crossTabDs2 := TABLE(relBasisRollup, avgRecRel, STD.Date.day(date),STD.Date.Month(date),city,crop,what);
 // // OUTPUT(sort(crossTabDs2,month,day),,'~test::basisavtmp::Avg_basis_Relative',thor,overwrite);
-// crossTabDs2 := TABLE(basisds, avgRecRel, STD.Date.day(date),STD.Date.Month(date),location_city,commodity,contractmonth,elevator_feed);
+// crossTabDs2 := TABLE(basisds, avgRecRel, STD.Date.day(date),STD.Date.Month(date),city,crop,contractmonth,what);
 // OUTPUT(sort(crossTabDs2,month,day),,'~test::basisavtmp::Avg_basis_relative',thor,overwrite);
