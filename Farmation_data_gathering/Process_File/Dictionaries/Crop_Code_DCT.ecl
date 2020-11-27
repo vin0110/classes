@@ -1,5 +1,5 @@
 Crop_Codes := DATASET([{'c', 'corn'}, 
-    {'s', 'soybeans'}, 
+    {'s', 'soy'}, 
     {'w', 'wheat'}], {STRING code, String crop});
 
 Crop_Code := DICTIONARY(Crop_Codes,{Code => crop});
