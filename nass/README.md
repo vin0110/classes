@@ -30,7 +30,114 @@ Now only 50 states.
   * HORTICULTURE: 0.6M
   * VEGETABLES: 0.4M
 * statisticcat_desc: 46 results; 13 > 9999; 25 < 1000
-  
+
+## Quickstats record
+* source_desc : CENSUS or SURVEY
+* sector_desc : ANIMALS & PRODUCTS; CROPS, DEMO, ECON, ENVIRONMENTAL
+* group_desc : sub category of sector
+* commodity_desc : ie, corn, cattle.
+* class_desc
+* prodn_practice_desc
+* util_practice_desc
+* statisticcat_desc
+* unit_desc : size/quantity
+* short_desc : mash up of commodity, prodn, util, statis, and unit
+* domain_desc : 
+* domaincat_desc;
+* agg_level_desc : ie, state, county
+* state_ansi
+* state_fips_code
+* state_alpha
+* state_name
+* asd_code : agricultral stats district
+* asd_desc :
+* county_ansi
+* county_code
+* county_name
+* region_desc
+* zip_5
+* watershed_code
+* watershed_desc;
+* congr_district_code
+* country_code
+* country_name
+* location_desc : 
+* year
+* freq_desc : ie, annual, monthly
+* begin_code : ???
+* end_code : ???
+* reference_period_desc : ie, year, week
+* week_ending
+* load_date
+* load_time
+* value : the actual data value
+* cv : coefficient of variation (only available for 2012 census)
+
+### What (descriptor)
+Some fields describe what data is collected.
+* source_desc
+* sector_desc
+* group_desc
+* commodity_desc
+* class_desc
+* prodn_practice_desc
+* util_practice_desc
+* statisticcat_desc
+* domain_desc
+* domaincat_desc
+* agg_level_desc
+
+Not all of these are needed.
+Many rows will have nil or generic values.
+
+### Which (selector)
+* state_ansi
+* state_fips_code
+* state_alpha
+* state_name
+* asd_code
+* asd_desc
+* county_ansi
+* county_code
+* county_name
+* region_desc
+* zip_5
+* watershed_code
+* watershed_desc
+* congr_district_code
+* country_code
+* country_name
+* location_desc
+* year
+* week_ending
+* freq_desc
+* reference_period_desc
+
+There are many duplicates above.
+A simpler list is:
+
+* state_ansi
+* asd_code
+* county_ansi
+* region_desc
+* zip_5
+* watershed_code
+* congr_district_code
+* country_code
+* country_name
+* year
+* week_ending
+
+### Value
+* value
+* unit_desc
+
+### Bookkeeping
+* begin_code : ???
+* end_code : ???
+* load_date
+* load_time
+
 ### W20200623-124141
 
 This work
@@ -84,3 +191,50 @@ level3: the when
 
 
 Having Datasets at level3 can be optional based on the dataset size and other unforeseen factors, publishing queries directly at level 2 data might turn out to be a better option.
+
+# Replicating the NC data book
+
+## Corn production
+
+Quickstats https://quickstats.nass.usda.gov/results/1143BEE6-29F0-37E4-A6D4-CF164E22AEF3
+
+ECL WU = W20210212-152258
+
+## Sweet potatoes
+
+QS URL=https://quickstats.nass.usda.gov/results/1143BEE6-29F0-37E4-A6D4-CF164E22AEF3
+
+ECL WU W20210212-153008
+
+## barley
+
+URL=https://quickstats.nass.usda.gov/results/71D368F9-2F95-3AAF-809C-DDF270173846
+
+URL=https://quickstats.nass.usda.gov/results/71D368F9-2F95-3AAF-809C-DDF270173846
+
+W20210212-153530
+
+# ECL code for rows in Ag Data book
+
+## All commodities
+
+## Broilers
+
+```
+    source_desc='SURVEY',
+    sector_desc='ANIMALS & PRODUCTS',
+    group_desc='POULTRY',
+    commodity_desc='CHICKENS',
+    class_desc='BROILERS',
+    prodn_practice_desc='ALL PRODUCTION PRACTICES',
+    statisticcat_desc='PRODUCTION',
+    domain_desc='TOTAL',
+    agg_level_desc='STATE',
+    state_alpha='NC',
+    unit_desc='$',
+    year>2015,
+    freq_desc='ANNUAL',
+    reference_period_desc='YEAR'
+```
+
+

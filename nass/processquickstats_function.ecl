@@ -2,7 +2,8 @@
 export processquickstats_function(String category) := FUNCTION
   IMPORT $.Records, STD;
 
-    today := STD.date.today();
+  //today := STD.date.today();
+  today := '20210219';
 
     raw_file_name := '~test::usda::qs.' + category + '_' + today + '.txt';
 
@@ -22,7 +23,7 @@ export processquickstats_function(String category) := FUNCTION
             SELF.YEAR := (INTEGER)LEFT.YEAR;
             SELF.BEGIN_CODE := (INTEGER)LEFT.BEGIN_CODE;
             SELF.END_CODE := (INTEGER)LEFT.END_CODE;
-            SELF.VALUE := (DECIMAL)LEFT.VALUE;
+            SELF.VALUE := (DECIMAL)STD.str.FilterOut(LEFT.VALUE, ',');
             SELF := LEFT));
 	
   return df ;
